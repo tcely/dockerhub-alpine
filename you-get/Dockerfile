@@ -1,6 +1,12 @@
 FROM alpine:edge
+LABEL maintainer="https://keybase.io/tcely"
 
-RUN apk --update add you-get && \
+ENV PAGER=less
+
+RUN apk --update add \
+        less man \
+        you-get \
+        && \
     apk upgrade && \
     rm -rf /var/cache/apk/*
 
