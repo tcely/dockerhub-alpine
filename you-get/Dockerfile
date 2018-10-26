@@ -5,7 +5,7 @@ ENV PAGER=less
 
 RUN apk --update add \
         less man \
-        you-get \
+        ffmpeg you-get \
         && \
     apk upgrade && \
     rm -rf /var/cache/apk/*
