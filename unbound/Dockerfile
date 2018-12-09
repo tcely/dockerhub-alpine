@@ -11,5 +11,5 @@ RUN apk --update add \
     apk upgrade && \
     rm -rf /var/cache/apk/*
 
-ENTRYPOINT ["/usr/sbin/unbound", "-p"]
+ENTRYPOINT ["/usr/sbin/unbound", "-d", "-p"]
 CMD ["-h"]
