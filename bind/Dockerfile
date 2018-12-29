@@ -16,7 +16,6 @@ RUN apk --update add \
     rm -rf /var/cache/apk/*
 
 RUN chmod -c a+rx /entrypoint.sh && \
-    chmod -c g-w /var/bind && \
     cp -p /etc/bind/bind.keys /var/bind/ && \
     ln -s ../../var/run/named/rndc.key /etc/bind/rndc.key
 
@@ -32,4 +31,4 @@ RUN mkdir -m 0755 -p /var/run/named /var/cache/bind && \
 # NOTE: Per Dockerfile manual -->
 #	"if any build steps change the data within the volume
 # 	 after it has been declared, those changes will be discarded."
-VOLUME ["/etc/bind", "/var/cache/bind"]
+VOLUME ["/etc/bind", "/var/bind", "/var/cache/bind"]
