@@ -15,6 +15,11 @@ RUN apk --update add \
     apk upgrade && \
     rm -rf /var/cache/apk/*
 
+RUN chmod -c a+rx /entrypoint.sh && \
+    chmod -c g-w /var/bind && \
+    cp -p /etc/bind/bind.keys /var/bind/ && \
+    ln -s ../../var/run/named/rndc.key /etc/bind/rndc.key
+
 # /var/cache/bind needs to be owned by "bind"
 # since we are mounting, do it manually
 # NOTE: Per Dockerfile manual --> need to mkdir the mounted dir to chown
