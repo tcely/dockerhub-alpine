@@ -7,4 +7,5 @@ RUN apk --update add \
     rm -rf /var/cache/apk/*
 
 VOLUME ["/out"]
+
 ENTRYPOINT ["/usr/bin/you-get", "--auto-rename", "--output-dir", "/out"]
