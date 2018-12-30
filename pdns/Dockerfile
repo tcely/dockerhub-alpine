@@ -1,10 +1,8 @@
-FROM alpine:edge
+FROM tcely/alpine-aports
 LABEL maintainer="https://keybase.io/tcely"
 
-ENV PAGER=less
 
 RUN apk --update add \
-        less man \
         pdns-backend-bind pdns-backend-sqlite3 \
         pdns-backend-mysql pdns-backend-pgsql \
         pdns-backend-lua pdns-backend-pipe \
@@ -12,7 +10,6 @@ RUN apk --update add \
         pdns-backend-geoip \
         pdns-tools pdns-doc \
         && \
-    apk upgrade && \
     rm -rf /var/cache/apk/*
 
 ENTRYPOINT ["/usr/sbin/pdns_server"]

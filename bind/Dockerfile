@@ -1,18 +1,14 @@
-FROM alpine:edge
+FROM tcely/alpine-aports
 LABEL maintainer="https://keybase.io/tcely"
-
-ENV PAGER=less
 
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
 EXPOSE 53/tcp 53/udp
 
 RUN apk --update add \
-        less man \
         bash ca-certificates \
         bind bind-tools bind-doc \
         && \
-    apk upgrade && \
     rm -rf /var/cache/apk/*
 
 RUN chmod -c a+rx /entrypoint.sh && \

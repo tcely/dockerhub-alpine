@@ -1,14 +1,11 @@
-FROM alpine:edge
+FROM tcely/alpine-aports
 LABEL maintainer="https://keybase.io/tcely"
 
-ENV PAGER=less
 
 RUN apk --update add \
-        less man \
         bash ca-certificates \
         tinc tinc-doc \
         && \
-    apk upgrade && \
     rm -rf /var/cache/apk/*
 
 EXPOSE 655/tcp 655/udp
