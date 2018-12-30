@@ -9,7 +9,7 @@ RUN apk --update add \
         && \
     rm -rf /var/cache/apk/*
 
-VOLUME /etc/tinc
+VOLUME ["/etc/tinc"]
 
 ENTRYPOINT ["/usr/sbin/tincd", "-D"]
 CMD ["--help"]
