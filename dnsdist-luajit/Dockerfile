@@ -1,6 +1,7 @@
 FROM tcely/alpine-aports
 LABEL maintainer="https://keybase.io/tcely"
 
+EXPOSE 53/tcp 53/udp
 
 # testing repository is not enabled by default
 RUN sed -i.orig -e '/community$/{p;s/community$/testing/;}' /etc/apk/repositories

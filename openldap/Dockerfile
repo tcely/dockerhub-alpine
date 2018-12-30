@@ -1,6 +1,7 @@
 FROM tcely/alpine-aports
 LABEL maintainer="https://keybase.io/tcely"
 
+EXPOSE 636/tcp 636/udp 389/tcp 389/udp
 
 RUN apk --update add \
         openldap openldap-clients \
@@ -10,6 +11,5 @@ RUN apk --update add \
     chown -R ldap:ldap /var/run/openldap && \
     rm -rf /var/cache/apk/*
 
-EXPOSE 636 636/udp 389 389/udp
 ENTRYPOINT ["/usr/sbin/slapd", "-u", "ldap", "-g", "ldap"]
 CMD ["-VVV"]
