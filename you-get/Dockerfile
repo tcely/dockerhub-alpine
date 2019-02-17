@@ -2,7 +2,7 @@ FROM tcely/alpine-aports
 LABEL maintainer="https://keybase.io/tcely"
 
 RUN apk --update add \
-        ffmpeg you-get \
+        ca-certificates ffmpeg you-get \
         && \
     rm -rf /var/cache/apk/*
 
