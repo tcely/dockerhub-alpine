@@ -2,7 +2,7 @@ FROM tcely/alpine-aports
 LABEL maintainer="https://keybase.io/tcely"
 
 RUN apk --update add \
-        ca-certificates \
+        ca-certificates openssl \
         quassel-core \
         && \
     rm -rf /var/cache/apk/*
