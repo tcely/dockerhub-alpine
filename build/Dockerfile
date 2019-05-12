@@ -8,7 +8,7 @@ RUN mkdir -v -p /var/cache/apk /etc/apk; \
     ln -v -s ../../var/cache/apk /etc/apk/cache
 
 RUN apk --update add \
-        git-doc gnupg less man vim \
+        git-doc gnupg less man vim xz \
         alpine-sdk lua-aports \
         && \
     apk upgrade && \
