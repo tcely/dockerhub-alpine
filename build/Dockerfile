@@ -8,7 +8,7 @@ RUN mkdir -v -p /var/cache/apk /etc/apk; \
     ln -v -s ../../var/cache/apk /etc/apk/cache
 
 RUN apk --update add \
-        less man vim \
+        git-doc less man vim \
         alpine-sdk lua-aports \
         && \
     apk upgrade && \
@@ -33,4 +33,4 @@ RUN printf -- '%s\n' > /alpine-builder \
     chmod -c 00644 /alpine-builder
 
 VOLUME ["/abuild", "/aports", "/var/cache/apk"]
-USER "${ALPINE_USER}":"${ALPINE_GROUP}"
+USER "${ALPINE_USER}"
