@@ -14,6 +14,8 @@ RUN apk --update add \
     apk upgrade && \
     rm -rf /var/cache/apk/*
 
+RUN sed -i.orig -e '/^export JOBS=/s/=.*$/\$(nproc)/' /etc/abuild.conf
+
 ENV ALPINE_GROUP=abuild ALPINE_USER=builder
 RUN addgroup root "${ALPINE_GROUP}" && \
     adduser -G "${ALPINE_GROUP}" -s /bin/sh -D "${ALPINE_USER}" && \
