@@ -15,7 +15,8 @@ RUN apk --update add \
     rm -rf /var/cache/apk/*
 
 ENV ALPINE_GROUP=abuild ALPINE_USER=builder
-RUN adduser -G "${ALPINE_GROUP}" -s /bin/sh -D "${ALPINE_USER}" && \
+RUN addgroup root "${ALPINE_GROUP}" && \
+    adduser -G "${ALPINE_GROUP}" -s /bin/sh -D "${ALPINE_USER}" && \
     printf -- \
     '%%%s ALL=(ALL) NOPASSWD: ALL\n' \
     "${ALPINE_GROUP}" > "/etc/sudoers.d/${ALPINE_GROUP}" && \
