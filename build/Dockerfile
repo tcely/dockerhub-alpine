@@ -35,5 +35,5 @@ RUN printf -- '%s\n' > /alpine-builder \
     '}' && \
     chmod -c 00644 /alpine-builder
 
-VOLUME ["/abuild", "/aports", "/var/cache/apk"]
+VOLUME ["/abuild", "/aports", "/home/builder", "/etc/apk", "/lib/apk", "/var/cache/apk", "/var/cache/distfiles"]
 USER "${ALPINE_USER}"
