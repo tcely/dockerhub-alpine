@@ -1,2 +1,3 @@
-# dockerhub-alpine
-Docker versions of tools available in Alpine Linux
+# dockerhub-alpine (build)
+
+A container used to build aports in Alpine Linux
