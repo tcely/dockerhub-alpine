@@ -46,13 +46,13 @@ RUN printf >> /etc/apk/repositories -- \
 
 RUN apk --update add \
         bash ca-certificates \
-        bind bind-tools bind-doc \
+        bind bind-plugins bind-tools bind-doc \
         && \
     rm -rf /var/cache/apk/*
 
 RUN chmod -c a+rx /entrypoint.sh && \
     cp -p /etc/bind/bind.keys /var/bind/ && \
-    ln -s ../../var/run/named/rndc.key /etc/bind/rndc.key
+    ln -f -s ../../var/run/named/rndc.key /etc/bind/rndc.key
 
 # /var/cache/bind needs to be owned by "bind"
 # since we are mounting, do it manually
