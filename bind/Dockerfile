@@ -1,29 +1,7 @@
-FROM tcely/alpine-aports AS builder
+FROM tcely/alpine-aports:builder AS builder
 LABEL maintainer="https://keybase.io/tcely"
 
 ENV aport_subdir='main/bind'
-ENV GH_BRANCH='bleeding' GH_REPO='https://github.com/tcely/aports.git'
-
-RUN apk --update add \
-        alpine-sdk lua-aports
-
-RUN printf >> /etc/abuild.conf -- \
-        'JOBS=%d\n' "$(nproc --ignore=1)" \
-        && \
-    printf >> /etc/abuild.conf -- \
-        'MAKEFLAGS=-j${JOBS}\n'
-
-RUN printf > /etc/sudoers.d/wheel -- \
-        '%%%s ALL=(ALL) NOPASSWD: ALL\n' wheel
-
-ENV USER='buildozer' HOME='/home/buildozer'
-RUN adduser -D "${USER}" && \
-    addgroup "${USER}" abuild && \
-    addgroup "${USER}" wheel && \
-    install -d -g abuild -m 775 /var/cache/distfiles
-
-USER "${USER}"
-WORKDIR "${HOME}"
 
 RUN abuild-keygen -ain
 
