@@ -5,7 +5,7 @@ ENV PAGER=less
 
 RUN apk --update upgrade -a && \
     apk add \
-        less man \
+        less mdocml \
         && \
     rm -rf /var/cache/apk/*
 
