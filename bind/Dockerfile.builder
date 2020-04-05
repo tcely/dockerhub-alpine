@@ -5,7 +5,7 @@ ENV aport_subdir='main/bind'
 
 RUN abuild-keygen -ain
 
-RUN git clone --depth=10 --branch "${GH_BRANCH}" "${GH_REPO}"
+RUN git clone --depth=5 --branch "${GH_BRANCH}" "${GH_REPO}"
 
 RUN cd "aports/${aport_subdir}" && \
     abuild -K -r && checkapk
