@@ -1,0 +1,67 @@
+--- a/abuild	2019-12-19 15:18:52.000000000 +0000
++++ b/abuild	2020-05-23 05:19:46.069236349 +0000
+@@ -256,7 +256,7 @@
+ 
+ 			# verify that our source does not have git tag version
+ 			# name as tarball (typicallly github)
+-			if is_remote "$i" && [ "${i#*::}" = "$i" ]; then
++			if is_remote "$i" && [ "$(url_from_uri "$i")" = "$i" ]; then
+ 				case ${i##*/} in
+ 				v$pkgver.tar.*|$pkgver.tar.*)
+ 					die "source ${i##*/} needs to be renamed to avoid possible collisions"
+@@ -350,7 +350,7 @@
+ }
+ 
+ # verify checksums
+-verify() {
++default_verify() {
+ 	local verified=false algo=
+ 	for algo in sha512 sha256 sha1 md5; do
+ 		local sums=
+@@ -368,6 +368,10 @@
+ 	return 0
+ }
+ 
++verify() {
++	default_verify
++}
++
+ # verify upstream sources
+ sourcecheck() {
+ 	local uri
+@@ -391,7 +395,7 @@
+ }
+ 
+ is_remote() {
+-	case "${1#*::}" in
++	case "$(url_from_uri "$1")" in
+ 		http://*|ftp://*|https://*)
+ 			return 0;;
+ 	esac
+@@ -439,6 +443,7 @@
+ 	mkdir -p "$srcdir"
+ 	for s in $source; do
+ 		if is_remote "$s"; then
++			fetch_gpg_signatures "$s"
+ 			uri_fetch_mirror "$s" || return 1
+ 			ln -sf "$SRCDEST/$(filename_from_uri $s)" "$srcdir"/
+ 		else
+@@ -2132,6 +2137,7 @@
+ 
+ 	[ -z "$source" ] && return 0
+ 	fetch
++	gpg_verify
+ 	for s in $source; do
+ 		files="$files $(filename_from_uri $s)"
+ 	done
+@@ -2460,6 +2466,10 @@
+ 	fi
+ }
+ 
++if [ -f "${sharedir}/gpg_signatures.sh" ]; then
++        . "${sharedir}/gpg_signatures.sh"
++fi
++
+ usage() {
+ 	cat <<-EOF
+ 		usage: $program [options] [-P REPODEST] [-s SRCDEST] [-D DESCRIPTION] [cmd] ...

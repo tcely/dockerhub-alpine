@@ -18,5 +18,12 @@ RUN adduser -D "${USER}" && \
     addgroup "${USER}" wheel && \
     install -d -g abuild -m 775 /var/cache/distfiles
 
+COPY abuild.patch /var/cache/distfiles/
+COPY gpg_signatures.sh /usr/share/abuild/
+
+RUN apk --update add \
+        abuild gnupg patch && \
+    patch -p 1 -i /var/cache/distfiles/abuild.patch "$(command -v abuild)"
+
 USER "${USER}"
 WORKDIR "${HOME}"
