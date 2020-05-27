@@ -5,7 +5,7 @@ ENV GH_BRANCH='bleeding' GH_REPO='https://github.com/tcely/aports.git'
 ENV USER='buildozer' HOME='/home/buildozer'
 
 RUN apk --update add \
-        alpine-sdk lua-aports
+        alpine-sdk lua-aports sudo
 
 RUN printf >> /etc/abuild.conf -- \
         'JOBS="$(nproc --ignore=1)"\nMAKEFLAGS="-j${JOBS}"\n'
