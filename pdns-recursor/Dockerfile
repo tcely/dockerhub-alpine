@@ -8,5 +8,7 @@ RUN apk --update add \
         && \
     rm -rf /var/cache/apk/*
 
+RUN install -v -d -m 00770 -o root -g recursor /var/run/pdns-recursor
+
 ENTRYPOINT ["/usr/sbin/pdns_recursor"]
 CMD ["--help"]
