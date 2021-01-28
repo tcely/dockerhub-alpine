@@ -18,6 +18,17 @@ RUN apk --update add \
         && \
     rm -rf /var/cache/apk/*
 
+RUN _installed="$( \
+    find . -name \*.apk -type f -exec basename {} .apk \; | \
+    while IFS= read -r _pkg; do \
+      __n="${_pkg%%-[0-9.]*-r[0-9]*}" ; \
+      __v="${_pkg##${__n}-}" ; \
+      apk info -e "${__n}=${__v}" ; \
+    done ; \
+    )" ; \
+    printf -- '%s\n' "${_installed}" ; \
+    [ 0 -lt "$( printf -- '%s\n' "${_installed}" | wc -w )" ]
+
 RUN chmod -c a+rx /entrypoint.sh && \
     cp -p /etc/bind/bind.keys /var/bind/ && \
     ln -f -s ../../var/run/named/rndc.key /etc/bind/rndc.key
