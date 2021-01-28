@@ -10,11 +10,11 @@ EXPOSE 53/tcp 53/udp
 COPY --from=builder /etc/apk/keys /etc/apk/keys
 COPY --from=builder /home/buildozer/packages /var/cache/apk-packages
 RUN printf >> /etc/apk/repositories -- \
-        '@builder %s\n' /var/cache/apk-packages/*
+        '%s\n' /var/cache/apk-packages/*
 
 RUN apk --update add \
         bash ca-certificates \
-        $(printf -- '%s@builder ' bind bind-plugins bind-tools bind-doc) \
+        bind bind-plugins bind-tools bind-doc \
         && \
     rm -rf /var/cache/apk/*
 
