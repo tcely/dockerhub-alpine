@@ -18,7 +18,8 @@ RUN apk --update add \
         && \
     rm -rf /var/cache/apk/*
 
-RUN _installed="$( \
+RUN cd /var/cache/apk-packages ; \
+    _installed="$( \
     find . -name \*.apk -type f -exec basename {} .apk \; | \
     while IFS= read -r _pkg; do \
       __n="${_pkg%%-[0-9.]*-r[0-9]*}" ; \
