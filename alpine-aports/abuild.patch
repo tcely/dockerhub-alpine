@@ -40,7 +40,8 @@
  	esac
 @@ -439,6 +443,7 @@
  	mkdir -p "$srcdir"
- 	for s in $source; do
+-	for s in $source; do
++	for s in ${source} ${gpgsource}; do
  		if is_remote "$s"; then
 +			fetch_gpg_signatures "$s"
  			uri_fetch_mirror "$s" || return 1
