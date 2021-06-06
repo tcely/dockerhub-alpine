@@ -170,7 +170,7 @@ gpg_verify() {
 }
 
 verify() {
-  gpg_verify
+  gpg_verify || die "Failed to verify with GPG!"
   default_verify
 }
 
