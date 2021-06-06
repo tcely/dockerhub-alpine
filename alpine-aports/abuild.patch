@@ -54,10 +54,12 @@
  	for s in $source; do
  		files="$files $(filename_from_uri $s)"
  	done
-@@ -2460,6 +2466,10 @@
+@@ -2460,6 +2466,12 @@
  	fi
  }
  
++fetch_gpg_signatures() { :; }
++gpg_verify() { :; }
 +if [ -f "${sharedir}/gpg_signatures.sh" ]; then
 +        . "${sharedir}/gpg_signatures.sh"
 +fi
