@@ -1,14 +1,5 @@
 --- a/abuild	2019-12-19 15:18:52.000000000 +0000
 +++ b/abuild	2020-05-23 05:19:46.069236349 +0000
-@@ -256,7 +256,7 @@
- 
- 			# verify that our source does not have git tag version
- 			# name as tarball (typicallly github)
--			if is_remote "$i" && [ "${i#*::}" = "$i" ]; then
-+			if is_remote "$i" && [ "$(url_from_uri "$i")" = "$i" ]; then
- 				case ${i##*/} in
- 				v$pkgver.tar.*|$pkgver.tar.*)
- 					die "source ${i##*/} needs to be renamed to avoid possible collisions"
 @@ -350,7 +350,7 @@
  }
  
@@ -29,15 +20,6 @@
  # verify upstream sources
  sourcecheck() {
  	local uri
-@@ -391,7 +395,7 @@
- }
- 
- is_remote() {
--	case "${1#*::}" in
-+	case "$(url_from_uri "$1")" in
- 		http://*|ftp://*|https://*)
- 			return 0;;
- 	esac
 @@ -439,6 +443,7 @@
  	mkdir -p "$srcdir"
 -	for s in $source; do
