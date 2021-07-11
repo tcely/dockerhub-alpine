@@ -1,4 +1,4 @@
-FROM tcely/alpine-aports
+FROM tcely/alpine-stable
 LABEL maintainer="https://keybase.io/tcely"
 
 ENV GH_BRANCH='bleeding' GH_REPO='https://github.com/tcely/aports.git'
