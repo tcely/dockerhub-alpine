@@ -12,6 +12,7 @@ RUN apk --update add \
         ca-certificates openssl \
         quassel-core \
         && \
+    /usr/bin/quasselcore --version && \
     rm -rf /var/cache/apk/*
 
 RUN install -d -m 00770 -o quassel -g quassel /data
