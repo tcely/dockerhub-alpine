@@ -1,4 +1,5 @@
 FROM tcely/alpine-aports:builder-bind AS builder
+FROM tcely/alpine-aports:builder-dns-root-hints AS dns-root-hints
 
 FROM tcely/alpine-aports
 LABEL maintainer="https://keybase.io/tcely"
@@ -6,6 +7,9 @@ LABEL maintainer="https://keybase.io/tcely"
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
 EXPOSE 53/tcp 53/udp
+
+COPY --from=dns-root-hints /etc/apk/keys /etc/apk/keys
+COPY --from=dns-root-hints /home/buildozer/packages/main /var/cache/apk-packages/data
 
 COPY --from=builder /etc/apk/keys /etc/apk/keys
 COPY --from=builder /home/buildozer/packages /var/cache/apk-packages

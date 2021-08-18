@@ -150,6 +150,9 @@ jobs:
             context: 'dhcp'
           - registry: docker.io
             environment: 'DockerHub'
+            context: 'dns-root-hints'
+          - registry: docker.io
+            environment: 'DockerHub'
             context: 'quassel'
 
     needs: 'builder'

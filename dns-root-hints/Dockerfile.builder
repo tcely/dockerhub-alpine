@@ -1,7 +1,7 @@
 FROM tcely/alpine-aports:builder AS builder
 LABEL maintainer="https://keybase.io/tcely"
 
-ENV aport_subdir='main/bind'
+ENV aport_subdir='main/dns-root-hints'
 
 RUN abuild-keygen -ain
 
