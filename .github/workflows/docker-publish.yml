@@ -8,12 +8,12 @@ name: Docker
 on:
   push:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  latest:
 
-#   environment: ${{ matrix.environment }}
-    concurrency: ci-${{ github.ref }}
+    environment: ${{ matrix.environment }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,16 +24,8 @@ jobs:
         include:
           - registry: ghcr.io
             environment: 'GitHub'
-            context: 'alpine-aports'
-            file: 'Dockerfile'
-            tag: 'latest'
-          - registry: ghcr.io
-            environment: 'GitHub'
-            context: 'alpine-aports'
-            file: 'Dockerfile.builder'
-            tag: 'builder'
-#         - registry: docker.io
-#           environment: 'DockerHub'
+          - registry: docker.io
+            environment: 'DockerHub'
 
     steps:
       - name: Checkout repository
@@ -53,7 +45,7 @@ jobs:
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
           registry: ${{ matrix.registry }}
-          username: ${{ github.actor }}
+          username: ${{ secrets.REGISTRY_LOGIN }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # Extract metadata (tags, labels) for Docker
@@ -62,7 +54,188 @@ jobs:
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          images: ${{ matrix.registry }}/${{ github.actor }}/alpine-aports
+          images: ${{ matrix.registry }}/${{ secrets.REGISTRY_LOGIN }}/${{ secrets.REGISTRY_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=latest
+
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: 'alpine-aports'
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  builder:
+
+    environment: ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - registry: ghcr.io
+            environment: 'GitHub'
+          - registry: docker.io
+            environment: 'DockerHub'
+
+    needs: 'latest'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry docker.io
+        if: ${{ 'docker.io' == matrix.registry }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ matrix.registry }}
+          username: ${{ secrets.REGISTRY_LOGIN }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+      - name: Log into registry ghcr.io
+        if: ${{ 'ghcr.io' == matrix.registry }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ matrix.registry }}
+          username: ${{ secrets.REGISTRY_LOGIN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ matrix.registry }}/${{ secrets.REGISTRY_LOGIN }}/${{ secrets.REGISTRY_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=builder
+
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: 'alpine-aports'
+          file: 'alpine-aports/Dockerfile.builder'
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  builders:
+
+    environment: ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'bind'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'dhcp'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'quassel'
+
+    needs: 'builder'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry docker.io
+        if: ${{ 'docker.io' == matrix.registry }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ matrix.registry }}
+          username: ${{ secrets.REGISTRY_LOGIN }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ matrix.registry }}/${{ secrets.REGISTRY_LOGIN }}/${{ secrets.REGISTRY_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=builder-${{ matrix.context }}
+
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.context }}/Dockerfile.builder
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  bleeding:
+
+    environment: ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - registry: docker.io
+            tag: 'bind'
+            environment: 'DockerHub'
+            context: 'bind'
+          - registry: docker.io
+            tag: 'dhcp'
+            environment: 'DockerHub'
+            context: 'dhcp'
+          - registry: docker.io
+            tag: 'quassel-core'
+            environment: 'DockerHub'
+            context: 'quassel'
+
+    needs: 'builders'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry docker.io
+        if: ${{ 'docker.io' == matrix.registry }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ matrix.registry }}
+          username: ${{ secrets.REGISTRY_LOGIN }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ matrix.registry }}/${{ secrets.REGISTRY_LOGIN }}/${{ secrets.REGISTRY_IMAGE }}
           flavor: |
             latest=false
           tags: |
@@ -74,7 +247,91 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: ${{ matrix.context }}
-          file: ${{ matrix.context }}/${{ matrix.file }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  edge:
+
+    environment: ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'dnsdist'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'dnsdist-luajit'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'openldap'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'pdns'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'pdns-recursor'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'restic'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'spamassassin'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'tinc'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'unbound'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'xkcdpass'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'you-get'
+          - registry: docker.io
+            environment: 'DockerHub'
+            context: 'zstd'
+
+    needs: 'builder'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry docker.io
+        if: ${{ 'docker.io' == matrix.registry }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ matrix.registry }}
+          username: ${{ secrets.REGISTRY_LOGIN }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ matrix.registry }}/${{ secrets.REGISTRY_LOGIN }}/${{ secrets.REGISTRY_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=${{ matrix.context }}
+
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ${{ matrix.context }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
