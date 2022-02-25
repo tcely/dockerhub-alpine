@@ -7,7 +7,7 @@ RUN apk --update add \
         pdns-backend-bind pdns-backend-sqlite3 \
         pdns-backend-mysql pdns-backend-pgsql \
         pdns-backend-pipe \
-        pdns-backend-random pdns-backend-remote \
+        pdns-backend-remote \
         pdns-backend-geoip \
         pdns-tools pdns-doc \
         && \
