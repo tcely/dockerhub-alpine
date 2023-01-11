@@ -16,8 +16,9 @@ RUN test -d /var/run/openldap || { \
     mkdir -v /var/run/openldap ; }
 
 # Enforce the ownership and display the results.
-RUN chown -v -R ldap:ldap /var/run/openldap && \
-    ls -alR /var/run/openldap
+RUN ls -ld /var/run/openldap && \
+    chown -v -R ldap:ldap /var/run/openldap && \
+    ls -ld /var/run/openldap
 
 ENTRYPOINT ["/usr/sbin/slapd", "-u", "ldap", "-g", "ldap"]
 CMD ["-VVV"]
