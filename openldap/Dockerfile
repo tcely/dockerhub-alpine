@@ -13,7 +13,7 @@ RUN apk --update add \
 # but it didn't always do that. Ensure it exists.
 RUN test -d /var/run/openldap || { \
     rm -v -rf /var/run/openldap && \
-    mkdir -v /var/run/openldap }
+    mkdir -v /var/run/openldap ; }
 
 # Enforce the ownership and display the results.
 RUN chown -v -R ldap:ldap /var/run/openldap && \
