@@ -11,9 +11,9 @@ RUN apk --update add \
 
 # The package has started creating /var/run/openldap itself,
 # but it didn't always do that. Ensure it exists.
-RUN test '!' -d /var/run/openldap && \
+RUN test -d /var/run/openldap || { \
     rm -v -rf /var/run/openldap && \
-    mkdir -v /var/run/openldap
+    mkdir -v /var/run/openldap }
 
 # Enforce the ownership and display the results.
 RUN chown -v -R ldap:ldap /var/run/openldap && \
