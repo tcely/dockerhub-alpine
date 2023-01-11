@@ -9,16 +9,15 @@ RUN apk --update add \
         && \
     rm -rf /var/cache/apk/*
 
+# Ensure the proper directory exists.
 # The package has started creating /var/run/openldap itself,
-# but it didn't always do that. Ensure it exists.
+# but it didn't always do that.
 RUN test -d /var/run/openldap || { \
     rm -v -rf /var/run/openldap && \
     mkdir -v /var/run/openldap ; }
 
-# Enforce the ownership and display the results.
-RUN ls -ld /var/run/openldap && \
-    chown -v -R ldap:ldap /var/run/openldap && \
-    ls -ld /var/run/openldap
+# Ensure the proper ownership of the directory.
+RUN chown -R ldap:ldap /var/run/openldap
 
 ENTRYPOINT ["/usr/sbin/slapd", "-u", "ldap", "-g", "ldap"]
 CMD ["-VVV"]
