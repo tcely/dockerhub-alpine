@@ -9,12 +9,15 @@ RUN apk --update add \
         && \
     rm -rf /var/cache/apk/*
 
-# The package started creating /var/run/openldap itself
-# it didn't used to do that. This might be safe to remove.
-RUN ls -ld /var/run/openldap && \
+# The package has started creating /var/run/openldap itself,
+# but it didn't always do that. Ensure it exists.
+RUN test '!' -d /var/run/openldap && \
     rm -v -rf /var/run/openldap && \
-    mkdir -v /var/run/openldap && \
-    chown -v -R ldap:ldap /var/run/openldap
+    mkdir -v /var/run/openldap
+
+# Enforce the ownership and display the results.
+RUN chown -v -R ldap:ldap /var/run/openldap && \
+    ls -alR /var/run/openldap
 
 ENTRYPOINT ["/usr/sbin/slapd", "-u", "ldap", "-g", "ldap"]
 CMD ["-VVV"]
