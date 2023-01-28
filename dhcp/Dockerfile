@@ -16,6 +16,18 @@ RUN apk --update add \
     : >> /var/lib/dhcp/dhcpd.leases && \
     rm -rf /var/cache/apk/*
 
+RUN cd /var/cache/apk-packages ; \
+    _installed="$( \
+    find . -name \*.apk -type f -exec basename {} .apk \; | \
+    while IFS= read -r _pkg; do \
+      __n="${_pkg%%-[0-9.]*-r[0-9]*}" ; \
+      __v="${_pkg##${__n}-}" ; \
+      apk info -e "${__n}=${__v}" ; \
+    done ; \
+    )" ; \
+    printf -- '%s\n' "${_installed}" ; \
+    [ 0 -lt "$( printf -- '%s\n' "${_installed}" | wc -w )" ]
+
 VOLUME ["/etc/dhcp"]
 
 ENTRYPOINT ["/usr/sbin/dhcpd", "-4", "-f", "-d"]
