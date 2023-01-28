@@ -16,9 +16,9 @@ COPY --from=builder /home/buildozer/packages /var/cache/apk-packages
 RUN printf >> /etc/apk/repositories -- \
         '%s\n' /var/cache/apk-packages/*
 
-RUN apk --update add \
+RUN _ver_mask='=~9.16' ; apk --update add \
         bash ca-certificates \
-        bind bind-plugins bind-tools bind-doc \
+        "bind${_ver_mask}" "bind-plugins${_ver_mask}" "bind-tools${_ver_mask}" "bind-doc${_ver_mask}" \
         && \
     rm -rf /var/cache/apk/*
 
