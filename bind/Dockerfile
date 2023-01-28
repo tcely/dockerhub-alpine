@@ -32,7 +32,7 @@ RUN cd /var/cache/apk-packages ; \
     done ; \
     )" ; \
     printf -- '%s\n' "${_installed}" ; \
-    [ 0 -lt "$( printf -- '%s\n' "${_installed}" | wc -w )" ]
+    [ 1 -lt "$( printf -- '%s\n' "${_installed}" | wc -w )" ]
 
 RUN chmod -c a+rx /entrypoint.sh && \
     cp -p /etc/bind/bind.keys /var/bind/ && \
