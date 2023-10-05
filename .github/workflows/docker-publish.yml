@@ -267,6 +267,9 @@ jobs:
         include:
           - registry: docker.io
             environment: 'DockerHub'
+            context: 'aria2'
+          - registry: docker.io
+            environment: 'DockerHub'
             context: 'dnsdist'
           - registry: docker.io
             environment: 'DockerHub'
