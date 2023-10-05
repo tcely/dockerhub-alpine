@@ -8,4 +8,4 @@ RUN apk --update add \
     rm -rf /var/cache/apk/*
 
 ENTRYPOINT ["/usr/bin/aria2c"]
-CMD ["--help='#all'"]
+CMD ["--help=#all"]
