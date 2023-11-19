@@ -18,7 +18,7 @@ VOLUME ["${ARIA2DIR}"]
 
 # I'm not sure if this is better than SIGTERM.
 # It is how I typically stop aria2c, so I'm keeping it.
-# Stopping does tend to take a ling time so, try:
+# Stopping does tend to take a long time so, try:
 # docker stop --time 600
 # This waits up to 10 minutes for aria2c to exit cleanly,
 # before sending the SIGKILL after the stop signal.
